@@ -1,0 +1,98 @@
+.ai-loader{
+    width:100%;
+    margin-top:25px;
+    padding:35px;
+    background:#1d2338;
+    border-radius:18px;
+    text-align:center;
+    animation:fadeIn .4s ease;
+}
+
+.robot-circle{
+    width:80px;
+    height:80px;
+    margin:auto;
+    border-radius:50%;
+    background:#7c5cff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:34px;
+    position:relative;
+    z-index:2;
+}
+
+.spinner-ring{
+    width:100px;
+    height:100px;
+    margin:-90px auto 20px;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.15);
+    border-top:4px solid #7c5cff;
+    animation:spin 1s linear infinite;
+}
+
+.ai-loader h3{
+    color:white;
+    margin-top:15px;
+    font-size:22px;
+}
+
+.ai-loader p{
+    color:#a0a7c0;
+    margin-top:10px;
+}
+
+.progress-bar{
+    width:100%;
+    height:10px;
+    margin-top:25px;
+    background:#2d3352;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    width:30%;
+    background:linear-gradient(90deg,#7c5cff,#9b8cff);
+    border-radius:20px;
+    animation:progressMove 2s infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes progressMove{
+
+0%{
+width:10%;
+}
+
+50%{
+width:70%;
+}
+
+100%{
+width:100%;
+}
+
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(15px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}

@@ -1,0 +1,30 @@
+:root {
+
+  /* Primary Colors — matched to Welcome page cyan/mint */
+  --primary: #29D3EE;
+  --primary-dark: #1CA9C9;
+  --mint: #4EE7C8;
+
+  /* Background Colors */
+  --background: #0B0E28;
+  --card: #131735;
+
+  /* Text Colors */
+  --text: #EDEFFB;
+  --gray: #9CA3C9;
+
+  /* Status Colors */
+  --success: #4EE7C8;
+  --danger: #FF8A8A;
+  --warning: #FCD34D;
+
+  /* UI */
+  --radius: 14px;
+
+  --shadow:
+      0 4px 20px rgba(0, 0, 0, 0.45);
+
+  /* Borders & accents */
+  --border: rgba(255, 255, 255, 0.08);
+  --glow: rgba(41, 211, 238, 0.18);
+}

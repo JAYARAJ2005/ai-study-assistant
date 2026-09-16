@@ -1,0 +1,149 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: var(--card);
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 20px;
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-close-btn {
+  display: none;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo-icon {
+  font-size: 26px;
+  color: var(--primary);
+}
+
+.sidebar-logo h2 {
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.sidebar-back-button {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--gray);
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.sidebar-back-button svg {
+  font-size: 16px;
+}
+
+.sidebar-back-button:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateX(5px);
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: var(--gray);
+  padding: 14px 18px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.sidebar-menu a svg {
+  font-size: 18px;
+}
+
+.sidebar-menu a:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateX(5px);
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.3s;
+  margin-top: auto;
+}
+
+.logout-button:hover {
+  background: #dc2626;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    border-radius: 8px;
+    color: var(--gray);
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+  }
+}

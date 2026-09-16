@@ -1,0 +1,41 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.main-section {
+  flex: 1;
+  margin-left: 260px; /* Same width as Sidebar */
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.page-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .main-section {
+    margin-left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  .page-content {
+    padding: 20px 16px;
+  }
+}

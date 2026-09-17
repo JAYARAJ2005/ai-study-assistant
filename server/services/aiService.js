@@ -9,9 +9,29 @@ function extractJSON(text) {
   return JSON.parse(cleaned);
 }
 
+// Retries a Gemini call a few times if the model is temporarily overloaded (503)
+async function generateWithRetry(prompt, retries = 3, delayMs = 1500) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const result = await model.generateContent(prompt);
+      return result;
+    } catch (err) {
+      const isOverloaded = err.message?.includes('503') || err.message?.includes('overloaded') || err.message?.includes('high demand');
+      const isLastAttempt = attempt === retries;
+
+      if (isOverloaded && !isLastAttempt) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
+        continue;
+      }
+
+      throw err;
+    }
+  }
+}
+
 async function generateSummary(text) {
   const prompt = `Summarize the following study material in clear, concise paragraphs suitable for a student reviewing before an exam. Keep it under 300 words.\n\nMaterial:\n${text}`;
-  const result = await model.generateContent(prompt);
+  const result = await generateWithRetry(prompt);
   return result.response.text();
 }
 
@@ -21,7 +41,7 @@ async function generateQuiz(text) {
 
 Material:
 ${text}`;
-  const result = await model.generateContent(prompt);
+  const result = await generateWithRetry(prompt);
   const parsed = extractJSON(result.response.text());
   return parsed.questions;
 }
@@ -32,13 +52,11 @@ async function generateFlashcards(text) {
 
 Material:
 ${text}`;
-  const result = await model.generateContent(prompt);
+  const result = await generateWithRetry(prompt);
   const parsed = extractJSON(result.response.text());
   return parsed.cards;
 }
 
-// Now accepts `history` (previous turns) so follow-ups like
-// "explain simply" or "what about the second one" have context.
 async function generateChatResponse(history, documentText, question) {
   const systemContext = documentText
     ? `You are a helpful study assistant. Answer the student's questions using ONLY the material below when relevant. If the answer isn't in the material, say so honestly.
@@ -55,8 +73,22 @@ ${documentText}`
     ],
   });
 
-  const result = await chat.sendMessage(question);
-  return result.response.text();
+  let lastErr;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const result = await chat.sendMessage(question);
+      return result.response.text();
+    } catch (err) {
+      lastErr = err;
+      const isOverloaded = err.message?.includes('503') || err.message?.includes('overloaded') || err.message?.includes('high demand');
+      if (isOverloaded && attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr;
 }
 
 module.exports = { generateSummary, generateQuiz, generateFlashcards, generateChatResponse };

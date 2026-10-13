@@ -2,7 +2,7 @@
 
 An AI-powered study companion that turns documents, YouTube videos, and freeform questions into summaries, quizzes, flashcards, and a conversational study assistant — built with the MERN stack and Google's Gemini API.
 
-**Live demo:** https://ai-study-assistant-psi-seven.vercel.app
+**Live demo:** https://ai-study-assistant-hub.vercel.app
 
 ---
 

@@ -13,6 +13,8 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [slow, setSlow] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -24,6 +26,9 @@ function Login() {
       return;
     }
 
+    setLoading(true);
+    const slowTimer = setTimeout(() => setSlow(true), 4000);
+
     try {
       const res = await api.post('/api/auth/login', {
         email,
@@ -34,6 +39,10 @@ function Login() {
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
+    } finally {
+      clearTimeout(slowTimer);
+      setLoading(false);
+      setSlow(false);
     }
   };
 
@@ -87,9 +96,20 @@ function Login() {
                 required
               />
             </div>
-            <button type="submit" className="auth-submit-btn">
-              Login
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? (
+                <span className="btn-loading">
+                  <span className="btn-spinner" /> Logging in...
+                </span>
+              ) : (
+                'Login'
+              )}
             </button>
+            {slow && (
+              <p className="auth-slow-msg">
+                Waking up the server, the first login can take up to a minute...
+              </p>
+            )}
           </form>
 
           <p className="auth-footer">

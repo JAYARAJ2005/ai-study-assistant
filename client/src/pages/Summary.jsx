@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import jsPDF from 'jspdf';
 import MainLayout from "../layouts/MainLayout/MainLayout";
 import HistoryPicker from '../components/HistoryPicker/HistoryPicker';
@@ -279,7 +282,9 @@ function Summary() {
                 📥 Export PDF
               </button>
             </div>
-            <ReactMarkdown>{summary}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+              {summary}
+            </ReactMarkdown>
           </div>
         )}
       </div>

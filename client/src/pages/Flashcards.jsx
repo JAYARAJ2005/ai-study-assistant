@@ -4,6 +4,7 @@ import api from '../services/api';
 import jsPDF from 'jspdf';
 import MainLayout from "../layouts/MainLayout/MainLayout";
 import HistoryPicker from '../components/HistoryPicker/HistoryPicker';
+import MathText from '../components/MathText/MathText';
 import { useNotifications } from '../context/NotificationContext';
 import usePageTitle from '../hooks/usePageTitle';
 import '../pages/Dashboard.css';
@@ -313,12 +314,12 @@ function Flashcards() {
                 >
                   <div className="flashcard-face flashcard-face-front">
                     <div className="flashcard-label">Term</div>
-                    <div className="flashcard-term">{card.front}</div>
+                    <div className="flashcard-term"><MathText text={card.front} inline /></div>
                     <span className="flashcard-tap-hint">tap to flip</span>
                   </div>
                   <div className="flashcard-face flashcard-face-back">
                     <div className="flashcard-label">Answer</div>
-                    <div className="flashcard-answer">{card.back}</div>
+                    <div className="flashcard-answer"><MathText text={card.back} inline /></div>
                     <span className="flashcard-tap-hint">tap to flip</span>
                   </div>
                 </div>

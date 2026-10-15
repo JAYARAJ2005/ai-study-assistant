@@ -4,6 +4,7 @@ import api from '../services/api';
 import jsPDF from 'jspdf';
 import MainLayout from "../layouts/MainLayout/MainLayout";
 import HistoryPicker from '../components/HistoryPicker/HistoryPicker';
+import MathText from '../components/MathText/MathText';
 import { useNotifications } from '../context/NotificationContext';
 import usePageTitle from '../hooks/usePageTitle';
 import './Dashboard.css';
@@ -390,7 +391,7 @@ function Quiz() {
               const chosen = selectedAnswers[i];
               return (
                 <div key={i} className="quiz-question">
-                  <p>{i + 1}. {q.question}</p>
+                  <p>{i + 1}. <MathText text={q.question} inline /></p>
                   <ul>
                     {q.options.map((opt, j) => {
                       let optionClass = '';
@@ -407,7 +408,7 @@ function Quiz() {
                           className={`${optionClass} ${!submitted ? 'selectable' : ''}`}
                           onClick={() => handleSelectOption(i, opt)}
                         >
-                          <strong>{String.fromCharCode(65 + j)}.</strong> {opt}
+                          <strong>{String.fromCharCode(65 + j)}.</strong> <MathText text={opt} inline />
                           {submitted && opt === q.correctAnswer && ' ✅'}
                           {submitted && optionClass === 'incorrect' && ' ❌'}
                         </li>

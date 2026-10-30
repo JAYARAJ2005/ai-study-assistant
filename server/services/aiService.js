@@ -57,6 +57,21 @@ ${text}`;
   return parsed.cards;
 }
 
+// Fallback for YouTube videos: Gemini reads the public video directly,
+// used when the transcript library is blocked (for example on cloud hosts)
+async function transcribeYoutubeVideo(videoUrl) {
+  const prompt =
+    'Watch this video and write out everything it teaches as detailed text in English. ' +
+    'Cover every topic, definition, formula, step and example in the order they appear. ' +
+    'Write it as continuous study notes. Do not add any introduction or commentary about the video itself.';
+
+  const result = await generateWithRetry([
+    prompt,
+    { fileData: { fileUri: videoUrl } },
+  ]);
+  return result.response.text();
+}
+
 async function generateChatResponse(history, documentText, question) {
   const systemContext = documentText
     ? `You are a helpful study assistant. Answer the student's questions using ONLY the material below when relevant. If the answer isn't in the material, say so honestly.
@@ -91,4 +106,10 @@ ${documentText}`
   throw lastErr;
 }
 
-module.exports = { generateSummary, generateQuiz, generateFlashcards, generateChatResponse };
+module.exports = {
+  generateSummary,
+  generateQuiz,
+  generateFlashcards,
+  generateChatResponse,
+  transcribeYoutubeVideo,
+};

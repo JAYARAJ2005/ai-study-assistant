@@ -3,6 +3,7 @@ const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
 const { YoutubeTranscript } = require('youtube-transcript');
 const Document = require('../models/Document');
+const { transcribeYoutubeVideo } = require('../services/aiService');
 
 exports.uploadDocument = async (req, res) => {
   try {
@@ -72,22 +73,38 @@ exports.createFromYoutube = async (req, res) => {
       return res.status(400).json({ message: 'Could not recognize a valid YouTube URL' });
     }
 
-    let transcriptItems;
+    let extractedText = '';
+
+    // 1) Try the transcript library first (works on localhost)
     try {
-      transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+      const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+      if (transcriptItems && transcriptItems.length > 0) {
+        extractedText = transcriptItems.map((item) => item.text).join(' ');
+      }
     } catch (transcriptErr) {
-      return res.status(400).json({
-        message: 'Could not fetch a transcript for this video. It may not have captions available.',
-      });
+      console.error('YouTube transcript error for', videoId, ':', transcriptErr);
     }
 
-    if (!transcriptItems || transcriptItems.length === 0) {
-      return res.status(400).json({
-        message: 'No transcript/captions found for this video.',
-      });
+    // 2) Fallback: let Gemini read the public video directly
+    if (!extractedText.trim()) {
+      try {
+        extractedText = await transcribeYoutubeVideo(
+          `https://www.youtube.com/watch?v=${videoId}`
+        );
+      } catch (geminiErr) {
+        console.error('Gemini YouTube fallback error for', videoId, ':', geminiErr);
+        return res.status(400).json({
+          message:
+            'Could not read this video. It must be a public video, and very long videos may not work.',
+        });
+      }
     }
 
-    const extractedText = transcriptItems.map((item) => item.text).join(' ');
+    if (!extractedText || !extractedText.trim()) {
+      return res.status(400).json({
+        message: 'No usable content found for this video.',
+      });
+    }
 
     const newDoc = await Document.create({
       userId: req.userId,
@@ -97,7 +114,7 @@ exports.createFromYoutube = async (req, res) => {
     });
 
     res.status(201).json({
-      message: 'Transcript fetched and processed successfully',
+      message: 'Video processed successfully',
       documentId: newDoc._id,
       preview: extractedText.slice(0, 300),
     });

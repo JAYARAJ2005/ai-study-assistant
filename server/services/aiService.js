@@ -61,9 +61,9 @@ ${text}`;
 // used when the transcript library is blocked (for example on cloud hosts)
 async function transcribeYoutubeVideo(videoUrl) {
   const prompt =
-    'Watch this video and write out everything it teaches as detailed text in English. ' +
-    'Cover every topic, definition, formula, step and example in the order they appear. ' +
-    'Write it as continuous study notes. Do not add any introduction or commentary about the video itself.';
+    'Watch this video and write concise but complete study notes in English, about 600 to 900 words. ' +
+    'Cover every main topic, definition, formula and example in the order they appear. ' +
+    'Do not add any introduction or commentary about the video itself.';
 
   const result = await generateWithRetry([
     prompt,

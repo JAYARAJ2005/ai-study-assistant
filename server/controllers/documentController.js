@@ -60,6 +60,16 @@ function extractVideoId(url) {
   return null;
 }
 
+// Stops waiting after a set time so a slow request cannot hang the whole flow
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Timed out after ${ms} ms`)), ms)
+    ),
+  ]);
+}
+
 exports.createFromYoutube = async (req, res) => {
   try {
     const { url } = req.body;
@@ -73,24 +83,48 @@ exports.createFromYoutube = async (req, res) => {
       return res.status(400).json({ message: 'Could not recognize a valid YouTube URL' });
     }
 
+    const filename = `YouTube: ${videoId}`;
+
+    // Reuse an earlier result for the same video (skips the slow step)
+    const existing = await Document.findOne({
+      userId: req.userId,
+      fileType: 'youtube',
+      filename,
+    });
+    if (existing) {
+      console.log('YouTube: reusing saved transcript for', videoId);
+      return res.status(201).json({
+        message: 'Video processed successfully',
+        documentId: existing._id,
+        preview: existing.extractedText.slice(0, 300),
+      });
+    }
+
     let extractedText = '';
 
-    // 1) Try the transcript library first (works on localhost)
+    // 1) Try the transcript library first (works on localhost), max 8 seconds
+    const t1 = Date.now();
     try {
-      const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+      const transcriptItems = await withTimeout(
+        YoutubeTranscript.fetchTranscript(videoId),
+        8000
+      );
       if (transcriptItems && transcriptItems.length > 0) {
         extractedText = transcriptItems.map((item) => item.text).join(' ');
       }
     } catch (transcriptErr) {
-      console.error('YouTube transcript error for', videoId, ':', transcriptErr);
+      console.error('YouTube transcript error for', videoId, ':', transcriptErr.message);
     }
+    console.log(`YouTube: transcript library step took ${Date.now() - t1} ms`);
 
     // 2) Fallback: let Gemini read the public video directly
     if (!extractedText.trim()) {
+      const t2 = Date.now();
       try {
         extractedText = await transcribeYoutubeVideo(
           `https://www.youtube.com/watch?v=${videoId}`
         );
+        console.log(`YouTube: Gemini video step took ${Date.now() - t2} ms`);
       } catch (geminiErr) {
         console.error('Gemini YouTube fallback error for', videoId, ':', geminiErr);
         return res.status(400).json({
@@ -108,7 +142,7 @@ exports.createFromYoutube = async (req, res) => {
 
     const newDoc = await Document.create({
       userId: req.userId,
-      filename: `YouTube: ${videoId}`,
+      filename,
       fileType: 'youtube',
       extractedText,
     });
